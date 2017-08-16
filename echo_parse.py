@@ -1,8 +1,9 @@
-# Version 2.5 7/11/17
+# Version 2.51 7/11/17
 # Make VAD identification more robust.
 # Added columns for manual entrys
 # extract ptyp, the I/O designation
 # First spyder version!
+# Fixed problem with capital letters in valve section
 
 from datetime import datetime
 startTime = datetime.now()
@@ -14,12 +15,12 @@ import numpy as np
 
 ## FOR REAL USE:
 # Input file (usually a MARS .out file). Text of all echo reports. **BAR formatted**
-path_inf = 'P:/SleepMedicine/PatelSanjayResearch/Research/ECHOforMike/07-07_all_cksms.out'
+path_inf = 'P:/SleepMedicine/PatelSanjayResearch/Research/ECHOforMike/MARS_sync/out/RAW/07-07_all_cksms.out'
 # Output file (no need to create in advance)
-path_outf = 'P:/SleepMedicine/PatelSanjayResearch/Research/ECHOforMike/07-07_all_cksms_parsed.txt'
+path_outf = 'P:/SleepMedicine/PatelSanjayResearch/Research/ECHOforMike/MARS_sync/out/RAW/07-07_all_cksms_parsed.txt'
 
 
-severity = ['mild', 'moderate', 'severe']
+severity = ['mild', 'moderate', 'severe', 'Mild', 'Moderate', 'Severe']
 
 # Dictionaries
 subtypes_cvis = {
@@ -234,40 +235,40 @@ def GetOut(inf, outf, path_inf):
                         dubs[0] += 1
                         dubs[4] += 1
                         howbad =  {x for x in severity if x in i}
-                        r_AS[-1] += ', '.join(howbad)
+                        r_AS[-1] += ' '.join([x.lower() for x in howbad])
                     if re.search(r'(aortic.*regurg|regurg.*aortic|aortic.*insuf|insuf.*aortic)', i, re.M|re.I):
                         dubs[1] += 1
                         dubs[4] += 1
                         howbad =  {x for x in severity if x in i}
-                        r_AI[-1] += ', '.join(howbad)
+                        r_AI[-1] += ' '.join([x.lower() for x in howbad])
                     if re.search(r'(mitral.*steno|steno.*mitral)', i, re.M|re.I):
                         dubs[2] += 1
                         dubs[4] += 1
                         howbad =  {x for x in severity if x in i}
-                        r_MS[-1] += ', '.join(howbad)
+                        r_MS[-1] += ' '.join([x.lower() for x in howbad])
                     if re.search(r'(mitral.*regurg|regurg.*mitral)', i, re.M|re.I):
                         dubs[3] += 1
                         dubs[4] += 1
                         howbad =  {x for x in severity if x in i}
-                        r_MR[-1] += ', '.join(howbad)
+                        r_MR[-1] += ' '.join([x.lower() for x in howbad])
                     if dubs[4] > 0:
                         r_flag[-1] += 'combinedimp^' # warning that a single impression combines comments on two different valve pathologies
                         
                 if any(j > 0 for j in dubs[:3]):
                     r_flag[-1] += 'multiline^' # warning that a valve pathology is mentioned in more than one impression line
 
-            else:
-                r_rvsp.append('not CVIS')
-                r_trj.append('not CVIS')
-                r_ef.append('not CVIS')
-                r_vad.append('not CVIS')
-                r_tds.append('not CVIS')
-                r_proto.append('not CVIS')
+            else: # -2222 is NOT CVIS
+                r_rvsp.append(-2222)
+                r_trj.append(-2222)
+                r_ef.append(-2222)
+                r_vad.append('-2222')
+                r_tds.append('-2222')
+                r_proto.append('-2222')
                 r_flag.append('')
-                r_AS.append('not CVIS')
-                r_AI.append('not CVIS')
-                r_MS.append('not CVIS')
-                r_MR.append('not CVIS')
+                r_AS.append('-2222')
+                r_AI.append('-2222')
+                r_MS.append('-2222')
+                r_MR.append('-2222')
                 
 
             demos = '|'.join([r_no[-1], r_cksm[-1], r_acid[-1], r_styp[-1], r_site[-1], r_mno[-1], r_ptyp[-1]])
